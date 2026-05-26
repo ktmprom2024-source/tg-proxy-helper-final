@@ -23,7 +23,18 @@ jobs:
 
     - name: Build with Gradle
       run: |
-        cd tg-proxy-helper-final
+        echo "=== Ищем файл gradlew в репозитории ==="
+        GRADLEW_PATH=$(find . -name gradlew -print -quit)
+        
+        if [ -z "$GRADLEW_PATH" ]; then
+          echo "Ошибка: Скрипт gradlew не найден! Проверяем структуру папок:"
+          ls -R
+          exit 1
+        fi
+        
+        echo "Файл найден по пути: $GRADLEW_PATH"
+        cd $(dirname "$GRADLEW_PATH")
+        
         chmod +x gradlew
         ./gradlew assembleDebug
 
@@ -31,4 +42,5 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: tg-proxy-helper-debug-apk
-        path: tg-proxy-helper-final/app/build/outputs/apk/debug/app-debug.apk
+        path: |
+          **/build/outputs/apk/debug/*.apk
